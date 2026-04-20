@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Digital Strategy Workshop · MRKT 441</title>
+<style>
+  :root {
+    --bg: #F5FAF8;
+    --surface: #FFFFFF;
+    --surface-alt: #E1F5EE;
+    --border: rgba(0,0,0,0.12);
+    --text: #04342C;
+    --text-secondary: #0F6E56;
+    --text-muted: #666;
+    --accent: #1D9E75;
+    --accent-dark: #085041;
+    --coral: #FAECE7;
+    --coral-border: #F0997B;
+    --coral-text: #712B13;
+    --coral-accent: #993C1D;
+    --danger: #E24B4A;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 2rem 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.5;
+  }
+  .container { max-width: 900px; margin: 0 auto; }
+  h1, h2, h3 { margin: 0; font-weight: 500; }
+  button {
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-size: 14px;
+    font-family: inherit;
+    cursor: pointer;
+    color: var(--text);
+    transition: all 0.15s;
+  }
+  button:hover { background: var(--surface-alt); }
+  input, textarea {
+    font-family: inherit;
+    color: var(--text);
+  }
+  .hero {
+    background: var(--surface-alt);
+    border-radius: 12px;
+    padding: 1.5rem 1.75rem;
+    margin-bottom: 1.25rem;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 1rem;
+    align-items: center;
+  }
+  .title { font-size: 26px; color: var(--text); }
+  .subtitle { font-size: 13px; color: var(--text-secondary); margin-top: 4px; }
+  .timer-box { text-align: right; }
+  .timer-label { font-size: 10px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.08em; }
+  .timer { font-size: 32px; font-weight: 500; font-variant-numeric: tabular-nums; color: var(--text); }
+  .tabs {
+    display: flex; gap: 6px; overflow-x: auto;
+    margin-bottom: 1rem; padding-bottom: 4px;
+  }
+  .tab {
+    flex: 0 0 auto;
+    padding: 10px 18px;
+    border-radius: 999px;
+    font-size: 13px; font-weight: 500;
+    border: 0.5px solid var(--border);
+    background: var(--surface);
+    color: var(--text-muted);
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .tab.active { background: var(--surface-alt); color: var(--accent-dark); border-color: var(--accent); }
+  .tab.ins.active { background: var(--coral); color: var(--coral-text); border-color: var(--coral-border); }
+  .dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); margin-left: 6px; }
+  .pick-card {
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.25rem;
+  }
+  .pick-head { font-size: 11px; font-weight: 500; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; }
+  .pick-title { font-size: 20px; margin-bottom: 8px; }
+  .pick-desc { font-size: 14px; color: var(--text-muted); margin-bottom: 16px; }
+  .brands {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 10px;
+  }
+  .tile {
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 8px;
+    padding: 14px 16px;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.15s;
+  }
+  .tile:hover:not(.taken) { background: var(--bg); }
+  .tile.taken { opacity: 0.5; cursor: not-allowed; background: #f0f0f0; border-left-color: var(--border); }
+  .tile-name { font-size: 15px; font-weight: 500; margin-bottom: 2px; }
+  .tile-tag { font-size: 12px; color: var(--text-muted); }
+  .badge-taken { position: absolute; top: 10px; right: 10px; background: var(--danger); color: white; font-size: 10px; font-weight: 500; padding: 2px 8px; border-radius: 999px; text-transform: uppercase; letter-spacing: 0.06em; }
+  .badge-mine { position: absolute; top: 10px; right: 10px; background: var(--accent-dark); color: white; font-size: 10px; font-weight: 500; padding: 2px 8px; border-radius: 999px; text-transform: uppercase; letter-spacing: 0.06em; }
+  .brief {
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 12px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1rem;
+  }
+  .brief-lbl { font-size: 10px; font-weight: 500; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px; }
+  .brief-name { font-size: 22px; font-weight: 500; margin-bottom: 4px; }
+  .brief-tag { font-size: 14px; color: var(--text-muted); margin-bottom: 10px; }
+  .details {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 8px;
+    margin-top: 10px;
+  }
+  .detail { background: var(--bg); border-radius: 8px; padding: 10px 14px; font-size: 12px; }
+  .detail-lbl { font-size: 10px; font-weight: 500; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 2px; }
+  .round {
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: 12px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1rem;
+  }
+  .round-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; margin-bottom: 8px; }
+  .round-name { font-size: 18px; }
+  .round-tag { font-size: 10px; font-weight: 500; padding: 3px 10px; border-radius: 999px; background: var(--coral); color: var(--coral-text); text-transform: uppercase; letter-spacing: 0.08em; white-space: nowrap; }
+  .round-prompt { font-size: 14px; color: var(--text-muted); margin-bottom: 10px; }
+  .challenges { background: var(--bg); border-radius: 8px; padding: 12px 14px; margin-bottom: 12px; }
+  .ch { font-size: 13px; color: var(--text); padding: 4px 0; }
+  .ch-n { color: var(--text-secondary); font-weight: 500; margin-right: 6px; }
+  .gal { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 8px; margin-bottom: 12px; }
+  .gal-card { background: var(--coral); border-radius: 8px; padding: 12px 14px; font-size: 12px; }
+  .gal-lbl { font-size: 9px; font-weight: 500; color: var(--coral-accent); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+  .gal-text { color: #4A1B0C; }
+  textarea.ans {
+    width: 100%;
+    min-height: 80px;
+    padding: 10px 12px;
+    font-size: 14px;
+    border: 0.5px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface);
+    color: var(--text);
+    resize: vertical;
+    margin-bottom: 4px;
+  }
+  textarea.ans:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 2px rgba(29,158,117,0.2); }
+  .f-lbl { font-size: 13px; font-weight: 500; margin: 12px 0 6px; }
+  .saved { font-size: 11px; color: var(--text-secondary); margin-bottom: 8px; opacity: 0; transition: opacity 0.3s; }
+  .saved.show { opacity: 1; }
+  .controls { display: flex; gap: 8px; margin-bottom: 1.25rem; flex-wrap: wrap; }
+  .ins-panel { background: var(--coral); border: 0.5px solid var(--coral-border); border-radius: 12px; padding: 1.25rem 1.5rem; }
+  .ins-head { font-size: 11px; font-weight: 500; color: var(--coral-accent); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; }
+  .prev { background: var(--surface); border-radius: 8px; padding: 12px 14px; margin-bottom: 8px; }
+  .prev-t { font-size: 13px; font-weight: 500; color: var(--coral-text); margin-bottom: 6px; }
+  .prev-c { font-size: 13px; white-space: pre-wrap; margin-bottom: 6px; }
+  .prev-e { font-size: 12px; color: #999; font-style: italic; }
+  .rsel { display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap; }
+  .rbtn { padding: 6px 12px; font-size: 12px; }
+  .rbtn.active { background: var(--coral-text); color: var(--coral); border-color: var(--coral-text); }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="hero">
+    <div>
+      <h1 class="title">🎮 Digital Strategy Workshop</h1>
+      <div class="subtitle">MRKT 441 · 60 min · claim brand → 3 rounds · Prof. Anwesha De</div>
+    </div>
+    <div class="timer-box">
+      <div class="timer-label">Elapsed</div>
+      <div id="timer" class="timer">00:00</div>
+    </div>
+  </div>
+  <div id="tabs" class="tabs"></div>
+  <div id="content"></div>
+  <div class="controls">
+    <button id="btn-timer">▶ Start timer</button>
+    <button id="btn-reset">Reset timer</button>
+    <button id="btn-clear" style="margin-left: auto;">🗑️ Clear my group</button>
+  </div>
+</div>
+
+<script>
+const brands = [
+  { id: "barkbox", name: "BarkBox Deluxe", tag: "Premium monthly dog treat & toy subscription",
+    details: [
+      { l: "Founded", v: "2022, Denver CO · 3 co-founders" },
+      { l: "Price point", v: "$45/month (3x category average)" },
+      { l: "Current customers", v: "12,000 subscribers · 18% monthly churn" },
+      { l: "Key challenge", v: "New dog owners don't know premium treats exist; stuck in Chewy's shadow." },
+      { l: "Unique angle", v: "Local farm treats, vet-formulated, indestructible toys with 30-day guarantee." }
+    ],
+    crisis: "Your October box contained treats from a new supplier. 40 customers have reported their dogs getting sick. One dog died. The story is trending on Reddit (r/dogs, 25k upvotes). Local news is calling. Your vet advisor is demanding a recall." },
+  { id: "nappods", name: "NapPods", tag: "20-minute nap lounges in major airports",
+    details: [
+      { l: "Founded", v: "2024, 8 locations (DEN, JFK, LAX, ORD, ATL, DFW, MIA, SEA)" },
+      { l: "Price point", v: "$25 for 20 min · $60 for 60 min" },
+      { l: "Current customers", v: "~40k monthly sessions · 70% first-timers" },
+      { l: "Key challenge", v: "Travelers don't know NapPods exist until walking past — missed pre-flight booking window." },
+      { l: "Unique angle", v: "Private, clean, booked by the minute. White noise, charger, blackout mask included." }
+    ],
+    crisis: "A security researcher just discovered your pod cameras (used for safety) were storing footage unencrypted on a public-facing server. 400 hours of footage of people sleeping — including some in underwear — is accessible by URL. A journalist broke the story an hour ago." },
+  { id: "grandmabot", name: "GrandmaBot", tag: "AI voice companion app for adults 65+",
+    details: [
+      { l: "Founded", v: "2023, San Francisco · $8M seed" },
+      { l: "Price point", v: "$19.99/month · often purchased by adult children for their parents" },
+      { l: "Current customers", v: "22,000 users · acquisition via Facebook ads to 40–55 age group" },
+      { l: "Key challenge", v: "Real gift-giver (adult child) differs from user (senior parent); trust + privacy slow signup." },
+      { l: "Unique angle", v: "Large-text UI, voice-first, daily check-in calls, weekly family highlights." }
+    ],
+    crisis: "An 82-year-old user's family is suing. They say GrandmaBot's 'friendly chat' encouraged her to transfer $40k to a scammer. The AI reassured her when she asked if it was safe. TechCrunch is running the story tomorrow." },
+  { id: "rerun", name: "ReRun Sneakers", tag: "Refurbished designer sneakers (Nike, Adidas, Jordan)",
+    details: [
+      { l: "Founded", v: "2021, Brooklyn NY · grew from a reselling Instagram account" },
+      { l: "Price point", v: "$85–$220 (vs. $180–$400 retail)" },
+      { l: "Current customers", v: "~8,000 customers · 60% Gen Z, 40% millennials" },
+      { l: "Key challenge", v: "Customers worry refurbished = fake; compete with StockX and GOAT on authenticity." },
+      { l: "Unique angle", v: "Every pair restored, certified authentic, photographed from 12 angles, 30-day return." }
+    ],
+    crisis: "StockX just published a report alleging 12% of your 'authenticated' sneakers are actually fake — including a pair sold to a celebrity who tweeted about it. Your refund queue has 600 claims filed overnight. Your authentication partner is blaming your photos." },
+  { id: "chilimail", name: "ChiliMail", tag: "Monthly hot sauce subscription from small-batch makers",
+    details: [
+      { l: "Founded", v: "2020, Austin TX · founder was a chef sourcing from farmers markets" },
+      { l: "Price point", v: "$28/month · 3 bottles from 3 different makers" },
+      { l: "Current customers", v: "15,000 subscribers · strong Reddit + Discord community" },
+      { l: "Key challenge", v: "Gift buyers want one-off; subscribers expect surprise & delight every month or they churn." },
+      { l: "Unique angle", v: "Maker story, recipe pairing, Scoville rating in every box. Sauces never repeated." }
+    ],
+    crisis: "Your November box featured a sauce from 'Madre's Kitchen,' whose branding uses imagery from Oaxacan culture. A viral TikTok (4M views) points out the founder is a white tech bro with no Mexican heritage. Subscribers are canceling in waves and tagging you as complicit." },
+  { id: "studybrew", name: "StudyBrew", tag: "Caffeinated study snacks for college students",
+    details: [
+      { l: "Founded", v: "2023, Lincoln NE · started in a UNL dorm room" },
+      { l: "Price point", v: "$3.99 per pouch · bulk pack of 12 for $39" },
+      { l: "Current customers", v: "Sold in 20 campus bookstores · DTC site gets ~3,000 monthly visitors" },
+      { l: "Key challenge", v: "Energy drink category is crowded (Celsius, Red Bull, Alani Nu); students default to convenience store." },
+      { l: "Unique angle", v: "Snacks (not drinks) with 80mg caffeine + L-theanine. 'Finals Week Trail Mix,' 'Thesis Crunch.'" }
+    ],
+    crisis: "A UNL student passed out during finals after eating 4 StudyBrew pouches in 6 hours. She's fine, but her parents are threatening a lawsuit. Local TV is running 'Is StudyBrew safe for students?' tonight. Your campus retailers are pulling you off shelves until they hear from you." }
+];
+
+const groups = [{id:"g1",label:"G1"},{id:"g2",label:"G2"},{id:"g3",label:"G3"},{id:"g4",label:"G4"},{id:"g5",label:"G5"},{id:"g6",label:"G6"}];
+
+const rounds = [
+  {
+    id: "r1", name: "Round 1 · Spot the Funnel", tag: "8 min · demand gen vs. harvest",
+    prompt: "Each ad below uses either demand generation or demand harvesting. Pick ONE that matches where your brand actually needs to focus — based on your Key Challenge. Rewrite it for your brand.",
+    challenges: [
+      "Look at your Key Challenge. Does your brand need demand GENERATION or HARVESTING more urgently?",
+      "Read the 6 ads below. Pick ONE whose strategy matches.",
+      "Classify it: Gen or Harvest. Explain why in one sentence.",
+      "Rewrite it for your brand. Specify: channel, hook/headline, target audience, call to action."
+    ],
+    gallery: [
+      { l: "Ad 1", t: "Super Bowl TV ad: 60 seconds of cinematic footage of a new electric SUV from a brand no one's heard of. No specs, no price. Ends with a logo reveal and 'Coming 2026.'" },
+      { l: "Ad 2", t: "Google search ad: 'Best running shoes under $100 — free returns, ships today. ⭐⭐⭐⭐⭐ 8,200 reviews. Shop now →' Appears for the query 'best running shoes under 100.'" },
+      { l: "Ad 3", t: "Instagram Reel (paid partnership): Skincare influencer with 480k followers: 'I've been using this serum for 2 weeks and my skin is different. Link in bio, code KAT15.'" },
+      { l: "Ad 4", t: "Retargeting banner on a travel news site: shows a hotel you browsed last week. 'Still thinking about Las Palmas Resort? Your room is still available — 15% off if you book by Friday.'" },
+      { l: "Ad 5", t: "Billboard on I-80: just a giant QR code and the word 'curious?' in plain black text. No logo, no brand name." },
+      { l: "Ad 6", t: "Abandoned cart email sent 24 hours after site exit: 'Hey Jamie, you left these Air Max 90s behind. We saved your size. Here's 10% off — code COMEBACK10. Expires in 48 hours.'" }
+    ],
+    fields: [
+      { k: "need", l: "Does your brand need GEN or HARVEST more right now? Why?" },
+      { k: "picked", l: "Which ad did you pick? What strategy is it using?" },
+      { k: "rewrite", l: "Rewrite the ad for your brand. Include channel, hook/headline, audience, CTA." }
+    ]
+  },
+  {
+    id: "r2", name: "Round 2 · Budget Wars", tag: "12 min · $10,000 allocation",
+    prompt: "You have a $10,000 monthly digital budget. Allocate across 6 channels based on cost, concentration, and effectiveness. Defend every dollar.",
+    challenges: [
+      "Review the channel reference below (from slide 13).",
+      "Allocate $10,000 across all 6 channels. Total MUST equal $10,000.",
+      "Write ONE sentence per channel justifying the amount.",
+      "Write your 30-second pitch: the strategic story behind your allocation.",
+      "🎲 Plot twist (when prof announces): Meta ad costs up 30% AND email is paused. Reallocate with $7,000 and no email."
+    ],
+    gallery: [
+      { l: "Channel reference (slide 13)", t: "Email: low cost, medium-high concentration/effectiveness. SEO: varies cost, medium-high concentration/effectiveness. Paid Search: medium-high cost, high concentration/effectiveness. Social Ads: medium-high cost, high concentration/effectiveness. Social Posting: varies, medium concentration, low-medium effectiveness. Display: low cost, medium-high concentration, low effectiveness." }
+    ],
+    fields: [
+      { k: "budget", l: "Initial $10,000 allocation (must total $10k) + one-line justification per channel" },
+      { k: "pitch", l: "Your 30-second pitch defending the allocation" },
+      { k: "twist", l: "🎲 Plot twist: $7k left, no email. Reallocate and explain what you cut." }
+    ]
+  },
+  {
+    id: "r3", name: "Round 3 · Crisis Mode", tag: "6 min · privacy / legal / ethical",
+    prompt: "Your brand has a crisis (shown below — tailored to your brief). Draft a 3-step response plan.",
+    challenges: [
+      "Read YOUR crisis in the gallery.",
+      "Step 1 — Immediate action (first 24 hours).",
+      "Step 2 — Public communication (channel, tone, message).",
+      "Step 3 — Long-term fix (policy, process, or product)."
+    ],
+    gallery: [],
+    fields: [
+      { k: "s1", l: "Step 1 — Immediate action (first 24 hours)" },
+      { k: "s2", l: "Step 2 — Public communication (channel, tone, message)" },
+      { k: "s3", l: "Step 3 — Long-term fix (policy, process, or product)" }
+    ]
+  }
+];
+
+const P = "dss60_";
+let active = "g1", insR = "r1";
+let st = { start: null, elapsed: 0, running: false };
+
+function esc(s) { const d = document.createElement("div"); d.textContent = s; return d.innerHTML; }
+function save(g, r, k, v) { try { localStorage.setItem(P + g + "_" + r + "_" + k, v); } catch (e) {} }
+function load(g, r, k) { try { return localStorage.getItem(P + g + "_" + r + "_" + k) || ""; } catch (e) { return ""; } }
+function saveB(g, b) { try { localStorage.setItem(P + "b_" + g, b); } catch (e) {} }
+function loadB(g) { try { return localStorage.getItem(P + "b_" + g) || ""; } catch (e) { return ""; } }
+function relB(g) { try { localStorage.removeItem(P + "b_" + g); } catch (e) {} }
+function claimed() { const c = {}; groups.forEach(g => { const b = loadB(g.id); if (b) c[b] = g.id; }); return c; }
+function clearGroup(g) { try { Object.keys(localStorage).filter(k => k.startsWith(P + g + "_")).forEach(k => localStorage.removeItem(k)); relB(g); } catch (e) {} }
+
+function renderTabs() {
+  const c = document.getElementById("tabs"); c.innerHTML = "";
+  groups.forEach(g => {
+    const b = document.createElement("button");
+    b.className = "tab" + (active === g.id ? " active" : "");
+    const cb = loadB(g.id); let h = g.label;
+    if (cb) { const br = brands.find(x => x.id === cb); if (br) h += '<span class="dot"></span>'; b.title = br ? br.name : g.label; }
+    b.innerHTML = h;
+    b.addEventListener("click", () => { active = g.id; render(); });
+    c.appendChild(b);
+  });
+  const i = document.createElement("button");
+  i.className = "tab ins" + (active === "ins" ? " active" : "");
+  i.textContent = "🔴 Instructor";
+  i.addEventListener("click", () => { active = "ins"; render(); });
+  c.appendChild(i);
+}
+
+function picker(g) {
+  const cl = claimed();
+  const d = document.createElement("div"); d.className = "pick-card";
+  d.innerHTML = '<div class="pick-head">' + esc(g.toUpperCase()) + ' · Step 1</div><h2 class="pick-title">Claim your brand</h2><p class="pick-desc">Pick one of the six startups below. Once claimed, it locks for all other groups. If you made a mistake, click "Change brand" on your brief.</p>';
+  const gr = document.createElement("div"); gr.className = "brands";
+  brands.forEach(b => {
+    const t = document.createElement("div");
+    const ic = cl[b.id]; const mine = ic === g;
+    t.className = "tile" + (ic && !mine ? " taken" : "");
+    let bh = ""; if (mine) bh = '<div class="badge-mine">yours</div>'; else if (ic) bh = '<div class="badge-taken">taken</div>';
+    t.innerHTML = bh + '<div class="tile-name">' + esc(b.name) + '</div><div class="tile-tag">' + esc(b.tag) + '</div>';
+    if (!ic || mine) {
+      t.addEventListener("click", () => {
+        if (mine) { if (confirm("Release " + b.name + "?")) { relB(g); render(); } }
+        else { saveB(g, b.id); render(); }
+      });
+    }
+    gr.appendChild(t);
+  });
+  d.appendChild(gr); return d;
+}
+
+function groupView(g) {
+  const c = document.getElementById("content"); c.innerHTML = "";
+  const bid = loadB(g); if (!bid) { c.appendChild(picker(g)); return; }
+  const b = brands.find(x => x.id === bid); if (!b) { c.appendChild(picker(g)); return; }
+
+  const bc = document.createElement("div"); bc.className = "brief";
+  let dh = '<div class="details">';
+  b.details.forEach(x => { dh += '<div class="detail"><div class="detail-lbl">' + esc(x.l) + '</div><div>' + esc(x.v) + '</div></div>'; });
+  dh += '</div>';
+  bc.innerHTML = '<div class="brief-lbl">Your brand brief · ' + esc(g.toUpperCase()) + '</div><div class="brief-name">' + esc(b.name) + '</div><div class="brief-tag">' + esc(b.tag) + '</div>' + dh + '<button id="relb-' + g + '" style="margin-top: 12px; font-size: 11px; padding: 4px 10px;">Change brand</button>';
+  c.appendChild(bc);
+  document.getElementById("relb-" + g).addEventListener("click", () => { if (confirm("Release " + b.name + "?")) { relB(g); render(); } });
+
+  rounds.forEach(r => {
+    const s = document.createElement("div"); s.className = "round";
+    let h = '<div class="round-head"><h3 class="round-name">' + esc(r.name) + '</h3><span class="round-tag">' + esc(r.tag) + '</span></div><p class="round-prompt">' + esc(r.prompt) + '</p><div class="challenges">';
+    r.challenges.forEach((x, i) => { h += '<div class="ch"><span class="ch-n">' + (i + 1) + '.</span>' + esc(x) + '</div>'; });
+    h += '</div>';
+    if (r.gallery.length > 0) {
+      h += '<div class="gal">';
+      r.gallery.forEach(x => { h += '<div class="gal-card"><div class="gal-lbl">' + esc(x.l) + '</div><div class="gal-text">' + esc(x.t) + '</div></div>'; });
+      h += '</div>';
+    }
+    if (r.id === "r3") { h += '<div class="gal"><div class="gal-card"><div class="gal-lbl">Your crisis</div><div class="gal-text">' + esc(b.crisis) + '</div></div></div>'; }
+    r.fields.forEach(f => {
+      const v = load(g, r.id, f.k);
+      h += '<div class="f-lbl">' + esc(f.l) + '</div><textarea class="ans" data-r="' + r.id + '" data-k="' + f.k + '">' + esc(v) + '</textarea><div class="saved" id="sv-' + r.id + '-' + f.k + '">✓ saved</div>';
+    });
+    s.innerHTML = h; c.appendChild(s);
+  });
+
+  c.querySelectorAll("textarea.ans").forEach(ta => {
+    let tm;
+    ta.addEventListener("input", () => {
+      const r = ta.getAttribute("data-r"), k = ta.getAttribute("data-k");
+      save(g, r, k, ta.value);
+      const sv = document.getElementById("sv-" + r + "-" + k);
+      if (sv) { sv.classList.add("show"); clearTimeout(tm); tm = setTimeout(() => sv.classList.remove("show"), 1200); }
+    });
+  });
+}
+
+function instructor() {
+  const c = document.getElementById("content"); c.innerHTML = "";
+  const p = document.createElement("div"); p.className = "ins-panel";
+  let h = '<div class="ins-head">Instructor view · peek at all groups</div><div class="rsel">';
+  rounds.forEach(r => { h += '<button class="rbtn ' + (insR === r.id ? "active" : "") + '" data-r="' + r.id + '">' + esc(r.name.split(" · ")[0]) + '</button>'; });
+  h += '</div>';
+  const r = rounds.find(x => x.id === insR);
+  h += '<div style="font-size: 13px; color: var(--coral-text); margin-bottom: 12px; font-weight: 500;">' + esc(r.name) + '</div>';
+  groups.forEach(g => {
+    const bid = loadB(g.id); const b = brands.find(x => x.id === bid);
+    h += '<div class="prev"><div class="prev-t">' + esc(g.label + (b ? " · " + b.name : " · (no brand)")) + '</div>';
+    let any = false;
+    r.fields.forEach(f => {
+      const v = load(g.id, r.id, f.k);
+      if (v && v.trim()) { any = true; h += '<div class="prev-c"><strong style="color:var(--accent-dark);font-weight:500">' + esc(f.l) + ':</strong> ' + esc(v) + '</div>'; }
+    });
+    if (!any) h += '<div class="prev-e">No answers yet.</div>';
+    h += '</div>';
+  });
+  p.innerHTML = h; c.appendChild(p);
+  p.querySelectorAll("button[data-r]").forEach(b => { b.addEventListener("click", () => { insR = b.getAttribute("data-r"); render(); }); });
+}
+
+function render() { renderTabs(); if (active === "ins") instructor(); else groupView(active); }
+function fmt(s) { return Math.floor(s/60).toString().padStart(2,"0") + ":" + Math.floor(s%60).toString().padStart(2,"0"); }
+function tick() { if (st.running) { const e = st.elapsed + (Date.now() - st.start)/1000; document.getElementById("timer").textContent = fmt(e); } }
+
+document.getElementById("btn-timer").addEventListener("click", () => {
+  if (st.running) { st.elapsed += (Date.now() - st.start)/1000; st.running = false; document.getElementById("btn-timer").textContent = "▶ Start timer"; }
+  else { st.start = Date.now(); st.running = true; document.getElementById("btn-timer").textContent = "⏸ Pause"; }
+});
+document.getElementById("btn-reset").addEventListener("click", () => { st.elapsed = 0; st.start = Date.now(); document.getElementById("timer").textContent = "00:00"; });
+document.getElementById("btn-clear").addEventListener("click", () => {
+  if (active !== "ins" && confirm("Clear all answers AND release brand for " + active.toUpperCase() + "?")) { clearGroup(active); render(); }
+});
+
+render();
+setInterval(tick, 500);
+</script>
+</body>
+</html>
